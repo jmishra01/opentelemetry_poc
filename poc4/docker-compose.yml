@@ -1,0 +1,75 @@
+services:
+  jaeger:
+    image: "jaegertracing/jaeger:2.1.0"
+    container_name: "jaeger"
+    ports:
+      - 16686:16686
+      - 4317:4317
+      - 4318:4318
+      - 5778:5778
+      - 9411:9411
+      - 14268:14268
+    network:
+      telemetry_network
+  mysql:
+    image: mysql:latest
+    container_name: tele-mysql
+    ports:
+      - "33061:3306"
+    command: --init-file /data/application/init.sql
+    volumes:
+      - ./init.sql:/data/application/init.sql
+    environment:
+      MUSQL_ROOT_USER: root
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: dev
+      MYSQL_USER: jmishra
+      MYSQL_PASSWORD: secret
+    network:
+      telemetry_network
+  gateway:
+    build: .
+    command: gunicorn -b 0.0.0.0:6001 gateway:app
+    ports:
+      - "6001:6001"
+    environment:
+      JAEGER: "jaeger"
+      DB_MYSQL_HOST: "tele-mysql"
+      DB_MYSQL_PORT: "3306"
+      DB_MYSQL_USER: "jmishra"
+      DB_MYSQL_PASSWORD: "secret"
+      SERVICE_NAME: "gateway"
+    network:
+      telemetry_network
+  service-1:
+    build: .
+    command: gunicorn -b 0.0.0.0:6002 service1:app
+    ports:
+      - "6002:6002"
+    environment:
+      JAEGER: "jaeger"
+      DB_MYSQL_HOST: "tele-mysql"
+      DB_MYSQL_PORT: "3306"
+      DB_MYSQL_USER: "jmishra"
+      DB_MYSQL_PASSWORD: "secret"
+      SERVICE_NAME: "service-1"
+    network:
+      telemetry_network
+  service-2:
+    build: .
+    command: gunicorn -b 0.0.0.0:6003 service2:app
+    ports:
+      - "6002:6002"
+    environment:
+      JAEGER: "jaeger"
+      DB_MYSQL_HOST: "tele-mysql"
+      DB_MYSQL_PORT: "3306"
+      DB_MYSQL_USER: "jmishra"
+      DB_MYSQL_PASSWORD: "secret"
+      SERVICE_NAME: "service-2"
+    network:
+      telemetry_network
+volumes:
+  redis-data:
+network:
+  telemetry_network
