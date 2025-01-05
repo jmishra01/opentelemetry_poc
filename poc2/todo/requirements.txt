@@ -1,0 +1,5 @@
+opentelemetry-instrumentation
+opentelemetry-distro
+opentelemetry-exporter-jaeger
+flask
+requests

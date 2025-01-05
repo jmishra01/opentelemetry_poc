@@ -1,0 +1,9 @@
+falcon < 4.0.0
+gunicorn
+opentelemetry-api
+opentelemetry-exporter-otlp-proto-grpc
+opentelemetry-instrumentation-requests
+opentelemetry-instrumentation-falcon
+opentelemetry-sdk
+opentelemetry-semantic-conventions
+requests

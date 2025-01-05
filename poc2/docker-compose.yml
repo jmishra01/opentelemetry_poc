@@ -1,0 +1,32 @@
+
+services:
+  user:
+    container_name: "user"
+    build: ./user
+    ports:
+      - 5001:5001
+    environment:
+      - OTEL_TRACES_EXPORTER=jaeger_thrift
+      - OTEL_SERVICE_NAME=user-service
+      - OTEL_EXPORTER_JAEGER_ENDPOINT=http://jaeger:14268/api/traces
+  
+  todo:
+    container_name: "todo"
+    build: ./todo
+    ports:
+      - 5002:5002
+    environment:
+      - OTEL_TRACES_EXPORTER=jaeger_thrift
+      - OTEL_SERVICE_NAME=todo-service
+      - OTEL_EXPORTER_JAEGER_ENDPOINT=http://jaeger:14268/api/traces
+
+  jaeger:
+    image: "jaegertracing/jaeger:2.1.0"
+    container_name: "jaeger"
+    ports:
+      - 16686:16686
+      - 4317:4317
+      - 4318:4318
+      - 5778:5778
+      - 9411:9411
+      - 14268:14268

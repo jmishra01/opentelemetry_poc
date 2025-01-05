@@ -1,0 +1,37 @@
+services:
+  jaeger:
+    image: "jaegertracing/jaeger:2.1.0"
+    container_name: "jaeger"
+    ports:
+      - 16686:16686
+      - 4317:4317
+      - 4318:4318
+      - 5778:5778
+      - 9411:9411
+      - 14268:14268
+  ms3:
+    container_name: "ms3"
+    build: ./ms3
+    ports:
+      - 8010:8010
+    environment:
+      - JAEGER=jaeger
+      - USER_DETAILS=http://ms2:8003/m2/user-details
+      - USER=http://ms1:8002/m1/user
+      - NUMBER-GENERATOR=http://ms1:8002/m1/number-generator
+  ms2:
+    container_name: "ms2"
+    build: ./ms2
+    ports:
+      - 8003:8003
+    environment:
+      - JAEGER=jaeger
+  ms1:
+    container_name: "ms1"
+    build: ./ms1
+    ports:
+      - 8002:8002
+    environment:
+      - JAEGER=jaeger
+      - USER_SERVICES=http://ms2:8003/m2/user-details
+
