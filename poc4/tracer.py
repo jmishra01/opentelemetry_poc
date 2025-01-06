@@ -1,12 +1,19 @@
 import falcon
 import requests
+import mysql.connector
+
 from opentelemetry import trace
+
 from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import BatchSpanProcessor, ConsoleSpanExporter
-from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from opentelemetry.sdk.resources import Resource
-import opentelemetry.instrumentation.requests
+
+from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+
+from opentelemetry.instrumentation.mysql import MySQLInstrumentor
+from opentelemetry.instrumentation.requests import RequestsInstrumentor
 from opentelemetry.instrumentation.falcon import FalconInstrumentor
+
 
 import os
 
@@ -33,10 +40,11 @@ provider.add_span_processor(processor)
 trace.set_tracer_provider(provider)
 
 
+
 tracer = trace.get_tracer(os.environ["SERVICE_NAME"])
 
-
+MySQLInstrumentor().instrument()
 FalconInstrumentor().instrument()
 # Requests package instrument
-opentelemetry.instrumentation.requests.RequestsInstrumentor().instrument()
+RequestsInstrumentor().instrument()
 

@@ -1,8 +1,10 @@
 falcon < 4.0.0
 gunicorn
+ipython
 mysql-connector-python
 opentelemetry-api
 opentelemetry-exporter-otlp-proto-grpc
+opentelemetry-instrumentation-mysql
 opentelemetry-instrumentation-requests
 opentelemetry-instrumentation-falcon
 opentelemetry-sdk

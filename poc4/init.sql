@@ -13,4 +13,5 @@ CREATE TABLE IF NOT EXISTS user (
 
 INSERT INTO user (user_name, api_name) VALUES ('jitendra', 'http://service-1:6002/service');
 INSERT INTO user (user_name, api_name) VALUES ('amit', 'http://service-2:6003/service');
+INSERT INTO user (user_name, api_name) VALUES ('fail', 'http://service-2:6003/service3');
 

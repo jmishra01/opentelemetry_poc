@@ -1,15 +1,9 @@
-import falcon
-import os
 import json
-from mysql.connector import connect
+import logging
 from tracer import *
 
 
 app = falcon.App()
-
-
-conn = connect(host=os.environ["DB_MYSQL_HOST"], port=os.environ["DB_MYSQL_PORT"],
-        user=os.environ["DB_MYSQL_USER"], password=os.environ["DB_MYSQL_PASSWORD"])
 
 
 class Gateway:
@@ -18,19 +12,30 @@ class Gateway:
         resp.text = "Gateway Services"
 
     def on_post(self, req, resp):
-        data = json.loads(req.stream.read())
+        try:
+            data = json.loads(req.stream.read())
 
-        cur = conn.cursor()
+            conf = dict(
+                host=os.environ["DB_MYSQL_HOST"], port=int(os.environ["DB_MYSQL_PORT"]),
+                user=os.environ["DB_MYSQL_USER"], password=os.environ["DB_MYSQL_PASSWORD"]
+            )
 
-        cur.execute(
-            "SELECT api_name FROM user WHERE user_name = '{}' GROUP BY api_name;".format(data["user_name"])
-        )
+            conn = mysql.connector.connect(**conf)
+            cur = conn.cursor()
 
-        url = cur.fetchall()[0][0]
+            cur.execute(
+                "SELECT api_name FROM dev.user WHERE user_name = '{}' GROUP BY api_name;".format(data["user_name"])
+            )
 
-        ret = requests.get(url)
+            url = cur.fetchall()[0][0]
 
-        resp.text = f"Result: {ret.text}"
+            ret = requests.get(url)
+
+            resp.text = f"Result: {ret.text}"
+        except Exception as ex:
+            logging.error(str(ex), stack_info=True, exc_info=True)
+            raise falcon.HTTP_500
+
 
 
 app.add_route("/gateway", Gateway())
